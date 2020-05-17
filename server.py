@@ -64,10 +64,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_age(self, arg_list):
         delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        customer_to_update = customer_to_update_list[0]
-        if customer_to_update:
-            customer_to_update['age'] = arg_list[1]
-            delta_list.append(customer_to_update)
+        if customer_to_update_list[0]:
+            customer_to_update_list[0]['age'] = arg_list[1]
+            delta_list.append(customer_to_update_list[0])
             self.immutably_reset(delta_list)
             return "Successfully Updated Age to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
         else:
@@ -75,10 +74,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_address(self, arg_list):
         delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        customer_to_update = customer_to_update_list[0]
-        if customer_to_update:
-            customer_to_update['address'] = arg_list[1]
-            delta_list.append(customer_to_update)
+        if customer_to_update_list[0]:
+            customer_to_update_list[0]['address'] = arg_list[1]
+            delta_list.append(customer_to_update_list[0])
             self.immutably_reset(delta_list)
             return "Successfully Updated Address to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
         else:
@@ -86,10 +84,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_phone(self, arg_list):
         delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        customer_to_update = customer_to_update_list[0]
-        if customer_to_update:
-            customer_to_update['phone_no'] = arg_list[1]
-            delta_list.append(customer_to_update)
+        if customer_to_update_list[0]:
+            customer_to_update_list[0]['phone_no'] = arg_list[1]
+            delta_list.append(customer_to_update_list[0])
             self.immutably_reset(delta_list)
             return "Successfully Updated Phone to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
         else:
