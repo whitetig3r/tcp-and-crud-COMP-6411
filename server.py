@@ -1,7 +1,7 @@
 import socketserver
 import os
 
-customer_tuples = []
+customer_tuples = {}
 
 ERR_DOES_NOT_EXIST = "Customer does not exist!"
 ERR_ALREADY_EXIST = "Customer already exists!"
@@ -11,7 +11,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
     # helper methods
     def serialize_and_migrate(self):
         data_file = open('data.txt','w')
-        for index, customer in enumerate(customer_tuples, start=1):
+        for index, customer in enumerate(customer_tuples.values(), start=1):
             data_file.write(self.disp_customer(customer))
             if index != len(customer_tuples): 
                 data_file.write(os.linesep)
@@ -20,22 +20,10 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def disp_customer(self, customer):
         return "{}|{}|{}|{}".format(customer['first_name'], customer['age'], customer['address'], customer['phone_no'])
 
-    def filtered_and_extract(self, c_name):
-        delta_list = list(filter(lambda customer: customer['first_name'] != c_name, customer_tuples))
-        customer_to_update_list = list(filter(lambda customer: customer['first_name'] == c_name, customer_tuples))
-        return delta_list, customer_to_update_list
-
-    def immutably_reset(self, updated_list):
-        global customer_tuples
-        customer_tuples = updated_list
-        self.serialize_and_migrate()
-
     # processing methods
     def process_find(self, arg_list):
-        found_list = list(filter(lambda customer: customer['first_name'] == arg_list[0], customer_tuples))
-        found_list = list(map(self.disp_customer, found_list))
-        if len(found_list) > 0:
-            return '\n'.join(found_list)
+        if arg_list[0].strip() in customer_tuples.keys():
+            return self.disp_customer(customer_tuples[arg_list[0].strip()])
         else:
             return ERR_NOT_FOUND  
 
@@ -46,54 +34,47 @@ class RequestHandler(socketserver.BaseRequestHandler):
             "address": arg_list[2].strip(),
             "phone_no": arg_list[3].strip()
         }
-        if customer_to_add not in customer_tuples:
-            updated_list = customer_tuples
-            updated_list.append(customer_to_add)
-            self.immutably_reset(updated_list)
+        if customer_to_add['first_name'] not in customer_tuples.keys():
+            customer_tuples[arg_list[0].strip()] = customer_to_add
+            self.serialize_and_migrate()
             return "Added tuple successfully -- {}".format(self.disp_customer(customer_to_add))
         else:
             return ERR_ALREADY_EXIST   
     
     def process_delete(self, arg_list):
-        found_list = list(filter(lambda customer: customer['first_name'] != arg_list[0], customer_tuples))
-        if len(found_list) < len(customer_tuples):
-            self.immutably_reset(found_list)
-            return "Successfully Deleted Customer with name -- {}".format(arg_list[0])    
+        if arg_list[0].strip() in customer_tuples.keys():
+            customer_tuples.pop(arg_list[0].strip())
+            self.serialize_and_migrate()
+            return "Successfully Deleted Customer with name -- {}".format(arg_list[0].strip())    
         else:
             return ERR_DOES_NOT_EXIST 
 
     def process_update_age(self, arg_list):
-        delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        if customer_to_update_list[0]:
-            customer_to_update_list[0]['age'] = arg_list[1]
-            delta_list.append(customer_to_update_list[0])
-            self.immutably_reset(delta_list)
-            return "Successfully Updated Age to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
+        if arg_list[0].strip() in customer_tuples.keys():
+            customer_tuples[arg_list[0].strip()]['age'] = arg_list[1].strip() 
+            self.serialize_and_migrate()
+            return "Successfully Updated Age to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
             return ERR_NOT_FOUND  
 
     def process_update_address(self, arg_list):
-        delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        if customer_to_update_list[0]:
-            customer_to_update_list[0]['address'] = arg_list[1]
-            delta_list.append(customer_to_update_list[0])
-            self.immutably_reset(delta_list)
-            return "Successfully Updated Address to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
+        if arg_list[0].strip() in customer_tuples.keys():
+            customer_tuples[arg_list[0].strip()]['address'] = arg_list[1].strip() 
+            self.serialize_and_migrate()
+            return "Successfully Updated Address to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
-            return ERR_NOT_FOUND 
+            return ERR_NOT_FOUND  
 
     def process_update_phone(self, arg_list):
-        delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
-        if customer_to_update_list[0]:
-            customer_to_update_list[0]['phone_no'] = arg_list[1]
-            delta_list.append(customer_to_update_list[0])
-            self.immutably_reset(delta_list)
-            return "Successfully Updated Phone to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
+        if arg_list[0].strip() in customer_tuples.keys():
+            customer_tuples[arg_list[0].strip()]['phone_no'] = arg_list[1].strip() 
+            self.serialize_and_migrate()
+            return "Successfully Updated Phone Number to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
-            return ERR_NOT_FOUND 
+            return ERR_NOT_FOUND  
 
     def process_print_report(self, arg_list):
-        return "\n".join(list(map(self.disp_customer, customer_tuples)))
+        return "\n".join(list(map(self.disp_customer, customer_tuples.values())))
 
     def parse_and_process(self):
         req = self.data.split("|")
@@ -130,12 +111,12 @@ def store_value_in_hash(c_tuple):
     if not c_tuple[0].strip(): 
         return
 
-    customer_tuples.append({
+    customer_tuples[c_tuple[0].strip()] = {
         "first_name" : c_tuple[0].strip(),
         "age": c_tuple[1].strip(),
         "address": c_tuple[2].strip(),
         "phone_no": c_tuple[3].strip()
-    })
+    }
 
 def load_db():
     data_file = open('data.txt','r')
