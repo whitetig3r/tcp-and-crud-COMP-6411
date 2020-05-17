@@ -9,7 +9,8 @@ def make_request(params = "print_report|"):
         sock.connect((HOST, PORT))
         sock.sendall(bytes(params + "\n", "utf-8"))
         received = str(sock.recv(1024), "utf-8")
-        print("Received:\n",received)
+        print("Received:")
+        print(received)
 
 def c_find():
     c_name = input("Enter name of customer to find:").strip()
@@ -20,7 +21,7 @@ def c_add():
     c_age = input("Enter age:").strip()
     c_address = input("Enter address:").strip()
     c_phone = input("Enter phone:").strip()
-    make_request("add|"+",".join([c_name,c_age,c_address,c_phone]))
+    make_request("add|"+SEP.join([c_name,c_age,c_address,c_phone]))
 
 def c_delete():
     c_name = input("Enter name of customer to delete:").strip()
@@ -77,6 +78,7 @@ while(True):
     elif selected_option == 7:
         c_print_report()
     elif selected_option == 8:
+        print("Good bye!")
         break 
     else:
         print("Please Enter a valid option!")                           
