@@ -2,7 +2,7 @@ import socket
 
 HOST = "localhost"
 PORT = 9999
-SEP = ","
+SEP = "$%^#"
 
 def make_request(params = "print_report|"):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:

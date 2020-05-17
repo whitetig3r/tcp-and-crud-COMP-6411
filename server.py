@@ -1,4 +1,5 @@
 import socketserver
+import os
 
 customer_tuples = []
 
@@ -10,12 +11,14 @@ class RequestHandler(socketserver.BaseRequestHandler):
     # helper methods
     def serialize_and_migrate(self):
         data_file = open('data.txt','w')
-        for customer in customer_tuples:
+        for index, customer in enumerate(customer_tuples, start=1):
             data_file.write(self.disp_customer(customer))
+            if index != len(customer_tuples): 
+                data_file.write(os.linesep)
         data_file.close()    
 
     def disp_customer(self, customer):
-        return "{}|{}|{}|{}|".format(customer['first_name'], customer['age'], customer['address'], customer['phone_no'])
+        return "{}|{}|{}|{}".format(customer['first_name'], customer['age'], customer['address'], customer['phone_no'])
 
     def filtered_and_extract(self, c_name):
         delta_list = list(filter(lambda customer: customer['first_name'] != c_name, customer_tuples))
@@ -85,7 +88,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
         delta_list, customer_to_update_list = self.filtered_and_extract(arg_list[0])
         customer_to_update = customer_to_update_list[0]
         if customer_to_update:
-            customer_to_update['phone'] = arg_list[1]
+            customer_to_update['phone_no'] = arg_list[1]
             delta_list.append(customer_to_update)
             self.immutably_reset(delta_list)
             return "Successfully Updated Phone to '{}' for Customer with Name -- {}".format(arg_list[1],arg_list[0])    
@@ -98,7 +101,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def parse_and_process(self):
         req = self.data.split("|")
         op = req[0]
-        arg_list = req[1].split(",")
+        arg_list = req[1].split("$%^#")
         if op == "find":
             return self.process_find(arg_list)
         elif op == "add":
