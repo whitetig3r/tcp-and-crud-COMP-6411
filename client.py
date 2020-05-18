@@ -18,7 +18,15 @@ def c_find():
 
 def c_add():
     c_name = input("Enter first name:").strip()
-    c_age = input("Enter age:").strip()
+    while(True):
+        c_age = input("Enter a valid age:").strip()
+        if(c_age.startswith('-')):
+            print("ERR: Negative age is INVALID!")
+            continue
+        if(c_age.isdigit() and int(c_age) < 150):
+            break
+        else:
+            print("ERR: Age is not a number OR age is too large")
     c_address = input("Enter address:").strip()
     c_phone = input("Enter phone:").strip()
     make_request("add|"+SEP.join([c_name,c_age,c_address,c_phone]))
@@ -29,7 +37,15 @@ def c_delete():
 
 def c_update_age():
     c_name = input("Enter name of customer to update:").strip()
-    c_age = input("Enter updated age:").strip()
+    while(True):
+        c_age = input("Enter a valid updated age:").strip()
+        if(c_age.startswith('-')):
+            print("ERR: Negative age is INVALID!")
+            continue
+        if(c_age.isdigit() and int(c_age) < 110):
+            break
+        else:
+            print("ERR: Age is not a number OR age is too large")
     make_request("update_age|"+SEP.join([c_name,c_age]))
 
 def c_update_address():

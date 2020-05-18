@@ -22,6 +22,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     # processing methods
     def process_find(self, arg_list):
+        print(customer_tuples.keys())
         if arg_list[0].strip() in customer_tuples.keys():
             return self.disp_customer(customer_tuples[arg_list[0].strip()])
         else:
@@ -80,6 +81,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
         req = self.data.split("|")
         op = req[0]
         arg_list = req[1].split("$%^#")
+        # names should be case insensitive
+        arg_list[0] = arg_list[0].lower()
         if op == "find":
             return self.process_find(arg_list)
         elif op == "add":
@@ -111,7 +114,7 @@ def store_value_in_hash(c_tuple):
     if not c_tuple[0].strip(): 
         return
 
-    customer_tuples[c_tuple[0].strip()] = {
+    customer_tuples[c_tuple[0].strip().lower()] = {
         "first_name" : c_tuple[0].strip(),
         "age": c_tuple[1].strip(),
         "address": c_tuple[2].strip(),
