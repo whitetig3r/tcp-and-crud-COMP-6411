@@ -9,20 +9,11 @@ ERR_NOT_FOUND = "Customer not found!"
 
 class RequestHandler(socketserver.BaseRequestHandler):
     # helper methods
-    def serialize_and_migrate(self):
-        data_file = open('data.txt','w')
-        for index, customer in enumerate(customer_tuples.values(), start=1):
-            data_file.write(self.disp_customer(customer))
-            if index != len(customer_tuples): 
-                data_file.write(os.linesep)
-        data_file.close()    
-
     def disp_customer(self, customer):
         return "{}|{}|{}|{}".format(customer['first_name'], customer['age'], customer['address'], customer['phone_no'])
 
     # processing methods
     def process_find(self, arg_list):
-        print(customer_tuples.keys())
         if arg_list[0].strip() in customer_tuples.keys():
             return self.disp_customer(customer_tuples[arg_list[0].strip()])
         else:
@@ -37,7 +28,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
         }
         if customer_to_add['first_name'] not in customer_tuples.keys():
             customer_tuples[arg_list[0].strip()] = customer_to_add
-            self.serialize_and_migrate()
             return "Added tuple successfully -- {}".format(self.disp_customer(customer_to_add))
         else:
             return ERR_ALREADY_EXIST   
@@ -45,15 +35,13 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def process_delete(self, arg_list):
         if arg_list[0].strip() in customer_tuples.keys():
             customer_tuples.pop(arg_list[0].strip())
-            self.serialize_and_migrate()
             return "Successfully Deleted Customer with name -- {}".format(arg_list[0].strip())    
         else:
             return ERR_DOES_NOT_EXIST 
 
     def process_update_age(self, arg_list):
         if arg_list[0].strip() in customer_tuples.keys():
-            customer_tuples[arg_list[0].strip()]['age'] = arg_list[1].strip() 
-            self.serialize_and_migrate()
+            customer_tuples[arg_list[0].strip()]['age'] = arg_list[1].strip()
             return "Successfully Updated Age to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
             return ERR_NOT_FOUND  
@@ -61,7 +49,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def process_update_address(self, arg_list):
         if arg_list[0].strip() in customer_tuples.keys():
             customer_tuples[arg_list[0].strip()]['address'] = arg_list[1].strip() 
-            self.serialize_and_migrate()
             return "Successfully Updated Address to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
             return ERR_NOT_FOUND  
@@ -69,7 +56,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def process_update_phone(self, arg_list):
         if arg_list[0].strip() in customer_tuples.keys():
             customer_tuples[arg_list[0].strip()]['phone_no'] = arg_list[1].strip() 
-            self.serialize_and_migrate()
             return "Successfully Updated Phone Number to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0].strip())    
         else:
             return ERR_NOT_FOUND  
@@ -98,13 +84,12 @@ class RequestHandler(socketserver.BaseRequestHandler):
         elif op == "print_report":
             return self.process_print_report(arg_list)
         else:
-            return "ERROR: BAD OP!"    
+            return "ERROR: UNRECOGNIZED OPERATION!"    
 
     def handle(self):
         self.data = self.request.recv(1024).strip()
-        print("{} requested -- :".format(self.client_address[0]))
+        print("{} made a request!".format(self.client_address[0]))
         self.data = self.data.decode("utf-8")
-        print("{}".format(self.data))
         ret_message = self.parse_and_process()
         self.request.sendall(ret_message.encode("utf-8"))
 
@@ -115,7 +100,7 @@ def store_value_in_hash(c_tuple):
         return
 
     customer_tuples[c_tuple[0].strip().lower()] = {
-        "first_name" : c_tuple[0].strip(),
+        "first_name" : c_tuple[0].strip().lower(),
         "age": c_tuple[1].strip(),
         "address": c_tuple[2].strip(),
         "phone_no": c_tuple[3].strip()

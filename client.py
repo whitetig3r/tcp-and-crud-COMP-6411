@@ -9,8 +9,22 @@ def make_request(params = "print_report|"):
         sock.connect((HOST, PORT))
         sock.sendall(bytes(params + "\n", "utf-8"))
         received = str(sock.recv(1024), "utf-8")
-        print("Received:")
+        print("\n-- Server Replied with -- \n")
         print(received)
+        print("\n-- END OF RESPONSE --")
+
+def get_age_input():
+    while(True):
+        c_age = input("Enter a valid age:").strip()
+        if not c_age:
+            return c_age
+        if(c_age.startswith('-')):
+            print("ERR: Negative age is INVALID!")
+            continue
+        if(c_age.isdigit() and int(c_age) < 150):
+            return c_age
+        else:
+            print("ERR: Age is not a number OR age is too large")
 
 def c_find():
     c_name = input("Enter name of customer to find:").strip()
@@ -18,15 +32,7 @@ def c_find():
 
 def c_add():
     c_name = input("Enter first name:").strip()
-    while(True):
-        c_age = input("Enter a valid age:").strip()
-        if(c_age.startswith('-')):
-            print("ERR: Negative age is INVALID!")
-            continue
-        if(c_age.isdigit() and int(c_age) < 150):
-            break
-        else:
-            print("ERR: Age is not a number OR age is too large")
+    c_age = get_age_input()
     c_address = input("Enter address:").strip()
     c_phone = input("Enter phone:").strip()
     make_request("add|"+SEP.join([c_name,c_age,c_address,c_phone]))
@@ -37,15 +43,7 @@ def c_delete():
 
 def c_update_age():
     c_name = input("Enter name of customer to update:").strip()
-    while(True):
-        c_age = input("Enter a valid updated age:").strip()
-        if(c_age.startswith('-')):
-            print("ERR: Negative age is INVALID!")
-            continue
-        if(c_age.isdigit() and int(c_age) < 110):
-            break
-        else:
-            print("ERR: Age is not a number OR age is too large")
+    c_age = get_age_input()
     make_request("update_age|"+SEP.join([c_name,c_age]))
 
 def c_update_address():
@@ -78,7 +76,14 @@ print ("Python DB Menu")
 
 while(True):
     print(MENU_STRING)
-    selected_option = int(input("Select:").strip())
+    selected_option = input("Select:").strip()
+    
+    if not selected_option.isdigit():
+        print("ERR: INVALID OPTION ENTERED!")
+        continue
+    else:
+        selected_option = int(selected_option)
+
     if selected_option == 1:
         c_find()
     elif selected_option == 2:
