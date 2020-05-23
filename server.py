@@ -22,9 +22,8 @@ class RequestHandler(socketserver.BaseRequestHandler):
     # processing methods
     def process_find(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip().lower()
             if arg_list[0] in customer_tuples.keys():
-                return self.disp_customer_pretty(customer_tuples[arg_list[0].strip()])
+                return self.disp_customer_pretty(customer_tuples[arg_list[0]])
             else:
                 return ERR_NOT_FOUND  
         except:
@@ -32,7 +31,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_add(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip()
             customer_to_add = {
                 "first_name" : arg_list[0],
                 "age": arg_list[1].strip(),
@@ -40,7 +38,7 @@ class RequestHandler(socketserver.BaseRequestHandler):
                 "phone_no": arg_list[3].strip()
             }
             if arg_list[0].lower() not in customer_tuples.keys():
-                customer_tuples[arg_list[0].lower()] = customer_to_add
+                customer_tuples[arg_list[0]] = customer_to_add
                 return "Added tuple successfully -- {}".format(self.disp_customer_pretty(customer_to_add))
             else:
                 return ERR_ALREADY_EXIST   
@@ -49,7 +47,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
     
     def process_delete(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip().lower()
             if arg_list[0] in customer_tuples.keys():
                 customer_tuples.pop(arg_list[0])
                 return "Successfully Deleted Customer with name -- {}".format(arg_list[0])    
@@ -60,7 +57,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_age(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip().lower() 
             if arg_list[0] in customer_tuples.keys():
                 customer_tuples[arg_list[0]]['age'] = arg_list[1].strip()
                 return "Successfully Updated Age to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0])    
@@ -71,7 +67,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_address(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip().lower() 
             if arg_list[0] in customer_tuples.keys():
                 customer_tuples[arg_list[0]]['address'] = arg_list[1].strip() 
                 return "Successfully Updated Address to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0])    
@@ -82,7 +77,6 @@ class RequestHandler(socketserver.BaseRequestHandler):
 
     def process_update_phone(self, arg_list):
         try:
-            arg_list[0] = arg_list[0].strip().lower() 
             if arg_list[0] in customer_tuples.keys():
                 customer_tuples[arg_list[0]]['phone_no'] = arg_list[1].strip() 
                 return "Successfully Updated Phone Number to '{}' for Customer with Name -- {}".format(arg_list[1].strip(),arg_list[0])    
@@ -103,6 +97,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
             req = self.data.split("|")
             op = req[0]
             arg_list = req[1].split(SEP)
+            arg_list[0] = arg_list[0].strip().lower()
+            if (op != "print_report") and (not arg_list[0]):
+                 return "ERROR: NAME CANNOT BE BLANK"
             if op == "find":
                 return self.process_find(arg_list)
             elif op == "add":
@@ -144,7 +141,7 @@ def store_value_in_hash(c_tuple):
             return
 
         customer_tuples[c_tuple[0].strip().lower()] = {
-            "first_name" : c_tuple[0].strip(),
+            "first_name" : c_tuple[0].strip().lower(),
             "age": c_tuple[1].strip(),
             "address": c_tuple[2].strip(),
             "phone_no": c_tuple[3].strip()

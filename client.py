@@ -38,19 +38,30 @@ def get_age_input():
             else:
                 print("ERROR: Age is not a number OR age is too large")
     except:
-        print("ERROR: FAILED TO TAKE AGE INPUT!")                
+        print("ERROR: FAILED TO TAKE AGE INPUT!")       
+
+def get_name_input(op):
+    try: 
+        while(True):
+            c_name = safe_input("Enter name of customer to %s:"%(op)).strip() 
+            if c_name:
+                return c_name
+            else:
+                print("ERROR: Name cannot be blank")
+    except:
+        print("ERROR: FAILED TO TAKE NAME INPUT!")            
 
 # core processing methods
 def c_find():
     try:
-        c_name = safe_input("Enter name of customer to find:").strip()
+        c_name = get_name_input("find")
         make_request("find|"+c_name)
     except:
         print("ERROR: FAILED TO PROCESS FIND")        
 
 def c_add():
     try:
-        c_name = safe_input("Enter first name:").strip()
+        c_name = get_name_input("add")
         c_age = get_age_input()
         c_address = safe_input("Enter address:").strip()
         c_phone = safe_input("Enter phone:").strip()
@@ -60,14 +71,14 @@ def c_add():
 
 def c_delete():
     try:
-        c_name = safe_input("Enter name of customer to delete:").strip()
+        c_name = get_name_input("delete")
         make_request("delete|"+c_name)
     except:
         print("ERROR: FAILED TO PROCESS DELETE")        
 
 def c_update_age():
     try:
-        c_name = safe_input("Enter name of customer to update:").strip()
+        c_name = get_name_input("update")
         c_age = get_age_input()
         make_request("update_age|"+SEP.join([c_name,c_age]))
     except:
@@ -75,7 +86,7 @@ def c_update_age():
 
 def c_update_address():
     try:
-        c_name = safe_input("Enter name of customer to update:").strip()
+        c_name = get_name_input("update")
         c_address = safe_input("Enter updated address:").strip()
         make_request("update_address|"+SEP.join([c_name,c_address]))
     except:
@@ -83,7 +94,7 @@ def c_update_address():
 
 def c_update_phone():
     try:
-        c_name = safe_input("Enter name of customer to update:").strip()
+        c_name = get_name_input("update")
         c_phone = safe_input("Enter updated phone:").strip()
         make_request("update_phone|"+SEP.join([c_name,c_phone]))
     except:
