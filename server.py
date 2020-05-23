@@ -88,7 +88,9 @@ class RequestHandler(socketserver.BaseRequestHandler):
     def process_print_report(self, arg_list):
         try:
             customer_list = list(map(self.disp_customer_pretty, customer_tuples.values()))
-            return "\n".join(sorted(customer_list))
+            tuples_string = "\n".join(sorted(customer_list))
+            record_count = "\nNUMBER OF RECORDS: {}\n".format(len(customer_list))
+            return record_count + tuples_string
         except:
             print("ERROR: FAILED TO PROCESS PRINT_REPORT OPERATION")    
 
